@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bilgi İstasyonları — 3D Öğrenme Oyunu (Dağıtık Sunucu Sürümü)</title>
+
+  <!--
+    ============================================================================
+    DİNAMİK BAZ ADRESİ (BASE URL) AYARLAYICISI
+    ============================================================================
+    Bu kod bloğu, index2.html başka bir sunucuda çalışırken diğer tüm CSS, JS,
+    görsel ve 3D model dosyalarının GitHub üzerindeki deponuzdan yüklenmesini sağlar.
+
+    Kullanım Seçenekleri:
+    1. YOL (Tavsiye Edilen - Ayar Gerektirmez): 
+       Dosyayı sunucunuza yükledikten sonra URL sonuna "?base=GITHUB_PAGES_LINKI" ekleyebilirsiniz.
+       Örn: https://siteniz.com/index2.html?base=https://kullaniciadi.github.io/depo-adi/
+
+    2. YOL (Statik Ayar):
+       Aşağıdaki CONFIG_BASE_URL değişkeninin içerisine GitHub Pages veya jsDelivr linkinizi yazın.
+       Örn: const CONFIG_BASE_URL = "https://kullaniciadi.github.io/depo-adi/";
+  -->
+  <script>
+    (function() {
+      // Buraya GitHub deponuzun Pages linkini veya jsDelivr CDN linkini yazabilirsiniz:
+      const CONFIG_BASE_URL = "https://erhan3861.github.io/3d_egitim_oyunu/"; 
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const queryBase = urlParams.get('base');
+      let finalBaseUrl = queryBase || CONFIG_BASE_URL;
+
+      if (finalBaseUrl) {
+        if (!finalBaseUrl.endsWith('/')) {
+          finalBaseUrl += '/';
+        }
+      } else {
+        // Eğer hiçbir adres belirtilmemişse, local/aynı klasör mantığıyla çalışır.
+        finalBaseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+      }
+
+      // Dinamik <base> tag'i eklenerek altındaki tüm göreli linklerin
+      // GitHub sunucusu üzerinden çekilmesi sağlanır.
+      const baseTag = document.createElement('base');
+      baseTag.href = finalBaseUrl;
+      document.head.appendChild(baseTag);
+
+      console.log("[Antigravity] Kaynaklar şu base adresten yükleniyor:", finalBaseUrl);
+    })();
+  </script>
+
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!--
+    ============================================================
+    DİNAMİK DEĞİŞKENLER
+    Bu blok, kullanıcı formundan doldurulmuş gibi düşünülmüştür.
+    Build/export sırasında {maarif} ve {ozel_talimat}
+    bu script bloğunun içine basılır.
+    ============================================================
+  -->
+  <script id="game-config" type="application/json">
+  {
+    "maarif": {
+      "ders": "Fen Bilimleri",
+      "sinif": "7. Sınıf",
+      "ogrenme_ciktilari": [
+        "Hücre ve organellerini açıklar",
+        "Mitoz ve mayoz bölünmeyi karşılaştırır",
+        "Kalıtımın temel kavramlarını tanır"
+      ]
+    },
+    "ozel_talimat": "Sorular eğlenceli ve günlük hayattan örneklerle olsun. Dil sade tutulsun."
+  }
+  </script>
+
+  <!--
+    ============================================================
+    GÖMÜLÜ STATİK SORU BANKASI
+    Her istasyona dağıtılacak sorular. station_id ile eşleşir.
+    ============================================================
+  -->
+  <script id="question-bank" type="application/json">
+  {
+    "questions": [
+      {
+        "station_id": "ist_1",
+        "ciktilar": "Hücre ve organellerini açıklar",
+        "soru": "Hücrenin enerji üretiminden sorumlu organel hangisidir?",
+        "secenekler": ["Ribozom", "Mitokondri", "Çekirdek", "Koful"],
+        "dogru": 1,
+        "odul": "guc"
+      },
+      {
+        "station_id": "ist_1",
+        "ciktilar": "Hücre ve organellerini açıklar",
+        "soru": "Bitki hücresini hayvan hücresinden ayıran yapı hangisidir?",
+        "secenekler": ["Hücre zarı", "Sitoplazma", "Hücre duvarı", "Ribozom"],
+        "dogru": 2,
+        "odul": "joker"
+      },
+      {
+        "station_id": "ist_2",
+        "ciktilar": "Mitoz ve mayoz bölünmeyi karşılaştırır",
+        "soru": "Üreme hücrelerinin oluşmasını sağlayan bölünme türü hangisidir?",
+        "secenekler": ["Mitoz", "Mayoz", "İkiye bölünme", "Tomurcuklanma"],
+        "dogru": 1,
+        "odul": "guc"
+      },
+      {
+        "station_id": "ist_2",
+        "ciktilar": "Mitoz ve mayoz bölünmeyi karşılaştırır",
+        "soru": "Mitoz bölünme sonucu kaç hücre oluşur?",
+        "secenekler": ["2", "4", "1", "8"],
+        "dogru": 0,
+        "odul": "guc"
+      },
+      {
+        "station_id": "ist_3",
+        "ciktilar": "Kalıtımın temel kavramlarını tanır",
+        "soru": "Anne ve babadan yavruya geçen kalıtsal birime ne denir?",
+        "secenekler": ["Hücre", "Gen", "Doku", "Organ"],
+        "dogru": 1,
+        "odul": "joker"
+      },
+      {
+        "station_id": "ist_3",
+        "ciktilar": "Kalıtımın temel kavramlarını tanır",
+        "soru": "Baskın (dominant) gen büyük harfle mi küçük harfle mi gösterilir?",
+        "secenekler": ["Küçük harf", "Büyük harf", "Rakam", "Sembol"],
+        "dogru": 1,
+        "odul": "guc"
+      }
+    ]
+  }
+  </script>
+
+  <!-- AĞIR KÜTÜPHANE: Three.js CDN'den (GitHub deposunu şişirmez) -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div id="hud">
+    <div class="hud-item">⚡ Güç: <span id="guc">0</span></div>
+    <div class="hud-item">🃏 Joker: <span id="joker">0</span></div>
+    <div class="hud-item">🏆 Puan: <span id="puan">0</span></div>
+    <div class="hud-item" id="hedef">İstasyon: 0/3</div>
+  </div>
+
+  <div id="ipucu">WASD ile hareket et · İstasyona yaklaş ve <b>E</b> ile soruyu aç</div>
+
+  <!-- Soru paneli (3D dışında, DOM overlay) -->
+  <div id="quiz-overlay" class="hidden">
+    <div id="quiz-box">
+      <p id="quiz-cikti" class="cikti"></p>
+      <h2 id="quiz-soru"></h2>
+      <div id="quiz-secenekler"></div>
+      <p id="quiz-sonuc"></p>
+      <button id="joker-btn">🃏 Joker kullan (0)</button>
+    </div>
+  </div>
+
+  <div id="kazandin" class="hidden">
+    <div class="kazandin-box">
+      <h1>🎉 Tebrikler!</h1>
+      <p>Tüm istasyonları tamamladın.</p>
+      <p id="final-skor"></p>
+      <div class="sifre-kutu">
+        <span class="sifre-etiket">🔑 Bitiş Şifren</span>
+        <span id="final-sifre"></span>
+      </div>
+      <button onclick="location.reload()">Tekrar Oyna</button>
+    </div>
+  </div>
+
+  <script type="module" src="js/game.js"></script>
+</body>
+</html>

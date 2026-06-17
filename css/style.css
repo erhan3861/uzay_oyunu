@@ -1,0 +1,88 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { overflow: hidden; font-family: system-ui, sans-serif; background: #0d1b2a; }
+canvas { display: block; }
+
+#hud {
+  position: fixed; top: 16px; left: 16px; z-index: 10;
+  display: flex; gap: 14px;
+}
+.hud-item {
+  background: rgba(13, 27, 42, 0.85); color: #e0fbfc;
+  padding: 10px 16px; border-radius: 12px; font-weight: 600;
+  border: 1px solid #415a77;
+}
+
+#ipucu {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  z-index: 10; color: #e0fbfc; background: rgba(13,27,42,.8);
+  padding: 10px 18px; border-radius: 20px; transition: opacity .3s;
+  border: 1px solid #415a77; font-size: 14px;
+}
+
+.hidden { display: none !important; }
+
+#quiz-overlay {
+  position: fixed; inset: 0; z-index: 20;
+  background: rgba(5, 12, 22, 0.75); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+}
+#quiz-box {
+  background: #1b263b; color: #e0fbfc; width: min(520px, 92vw);
+  padding: 28px; border-radius: 18px; border: 1px solid #415a77;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+}
+.cikti { color: #90e0ef; font-size: 13px; margin-bottom: 8px; }
+#quiz-box h2 { font-size: 20px; margin-bottom: 20px; line-height: 1.4; }
+#quiz-secenekler { display: grid; gap: 10px; }
+.secenek {
+  background: #2a3a52; color: #e0fbfc; border: 1px solid #415a77;
+  padding: 14px; border-radius: 12px; font-size: 15px; cursor: pointer;
+  text-align: left; transition: all .15s;
+}
+.secenek:hover { background: #34465f; transform: translateX(4px); }
+.secenek.dogru { background: #06d6a0; color: #04231b; border-color: #06d6a0; }
+.secenek.yanlis { background: #ef476f; border-color: #ef476f; }
+#quiz-sonuc { margin-top: 16px; font-weight: 600; min-height: 22px; text-align: center; }
+
+#kazandin {
+  position: fixed; inset: 0; z-index: 30;
+  background: rgba(5,12,22,.9); display: flex;
+  align-items: center; justify-content: center;
+}
+.kazandin-box {
+  background: #1b263b; color: #e0fbfc; text-align: center;
+  padding: 40px; border-radius: 20px; border: 1px solid #415a77;
+}
+.kazandin-box h1 { font-size: 32px; margin-bottom: 12px; }
+.kazandin-box p { margin: 8px 0; }
+.kazandin-box button {
+  margin-top: 18px; background: #4cc9f0; color: #04231b; border: none;
+  padding: 12px 28px; border-radius: 12px; font-weight: 700; cursor: pointer;
+}
+
+/* Joker butonu */
+#joker-btn {
+  margin-top: 16px; width: 100%;
+  background: #7209b7; color: #fff; border: none;
+  padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer;
+  transition: opacity .2s;
+}
+#joker-btn:disabled { opacity: .4; cursor: not-allowed; }
+#joker-btn:not(:disabled):hover { background: #8a1ed0; }
+
+/* Joker ile elenen şık */
+.secenek.elendi {
+  opacity: .25; text-decoration: line-through; pointer-events: none;
+}
+
+/* Bitiş şifre kutusu */
+.sifre-kutu {
+  margin: 18px 0; padding: 16px; border-radius: 14px;
+  background: #0d1b2a; border: 2px dashed #4cc9f0;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.sifre-etiket { font-size: 13px; color: #90e0ef; }
+#final-sifre {
+  font-size: 24px; font-weight: 800; letter-spacing: 2px; color: #ffd60a;
+  font-family: monospace;
+}
