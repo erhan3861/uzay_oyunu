@@ -3,60 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bilgi İstasyonları — 3D Öğrenme Oyunu (Dağıtık Sunucu Sürümü)</title>
+  <title>Asteroid Bilgi Savaşı — 3D Uzay Öğrenme Oyunu</title>
 
   <!--
     ============================================================================
-    DİNAMİK BAZ ADRESİ (BASE URL) AYARLAYICISI
+    DİNAMİK BAZ ADRESİ (BASE URL) — Dağıtık sunucu desteği
+    Başka bir sunucuda çalışırken css/js/model dosyalarını GitHub'dan çeker.
+    ?base=... query parametresi ile veya CONFIG_BASE_URL ile ayarlanır.
     ============================================================================
-    Bu kod bloğu, index2.html başka bir sunucuda çalışırken diğer tüm CSS, JS,
-    görsel ve 3D model dosyalarının GitHub üzerindeki deponuzdan yüklenmesini sağlar.
-
-    Kullanım Seçenekleri:
-    1. YOL (Tavsiye Edilen - Ayar Gerektirmez): 
-       Dosyayı sunucunuza yükledikten sonra URL sonuna "?base=GITHUB_PAGES_LINKI" ekleyebilirsiniz.
-       Örn: https://siteniz.com/index2.html?base=https://kullaniciadi.github.io/depo-adi/
-
-    2. YOL (Statik Ayar):
-       Aşağıdaki CONFIG_BASE_URL değişkeninin içerisine GitHub Pages veya jsDelivr linkinizi yazın.
-       Örn: const CONFIG_BASE_URL = "https://kullaniciadi.github.io/depo-adi/";
   -->
   <script>
-    (function() {
-      // Buraya GitHub deponuzun Pages linkini veya jsDelivr CDN linkini yazabilirsiniz:
-      const CONFIG_BASE_URL = "https://erhan3861.github.io/3d_egitim_oyunu/"; 
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const queryBase = urlParams.get('base');
-      let finalBaseUrl = queryBase || CONFIG_BASE_URL;
-
-      if (finalBaseUrl) {
-        if (!finalBaseUrl.endsWith('/')) {
-          finalBaseUrl += '/';
-        }
-      } else {
-        // Eğer hiçbir adres belirtilmemişse, local/aynı klasör mantığıyla çalışır.
-        finalBaseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
-      }
-
-      // Dinamik <base> tag'i eklenerek altındaki tüm göreli linklerin
-      // GitHub sunucusu üzerinden çekilmesi sağlanır.
-      const baseTag = document.createElement('base');
-      baseTag.href = finalBaseUrl;
-      document.head.appendChild(baseTag);
-
-      console.log("[Antigravity] Kaynaklar şu base adresten yükleniyor:", finalBaseUrl);
-    })();
+  (function() {
+    const CONFIG_BASE_URL = "https://erhan3861.github.io/3d_egitim_oyunu/";
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryBase = urlParams.get('base');
+    let finalBaseUrl = queryBase || CONFIG_BASE_URL;
+    if (finalBaseUrl) {
+      if (!finalBaseUrl.endsWith('/')) { finalBaseUrl += '/'; }
+    } else {
+      finalBaseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+    }
+    const baseTag = document.createElement('base');
+    baseTag.href = finalBaseUrl;
+    document.head.appendChild(baseTag);
+    console.log("[Uzay] Kaynaklar şu base adresten yükleniyor:", finalBaseUrl);
+  })();
   </script>
 
   <link rel="stylesheet" href="css/style.css" />
 
   <!--
     ============================================================
-    DİNAMİK DEĞİŞKENLER
-    Bu blok, kullanıcı formundan doldurulmuş gibi düşünülmüştür.
-    Build/export sırasında {maarif} ve {ozel_talimat}
-    bu script bloğunun içine basılır.
+    DİNAMİK DEĞİŞKENLER — formdan/üretimden gelmiş gibi
+    Build sırasında {maarif} ve {ozel_talimat} buraya basılır.
     ============================================================
   -->
   <script id="game-config" type="application/json">
@@ -65,71 +44,64 @@
       "ders": "Fen Bilimleri",
       "sinif": "7. Sınıf",
       "ogrenme_ciktilari": [
-        "Hücre ve organellerini açıklar",
-        "Mitoz ve mayoz bölünmeyi karşılaştırır",
-        "Kalıtımın temel kavramlarını tanır"
+        "Güneş sistemindeki gezegenleri tanır",
+        "Ay'ın evrelerini açıklar",
+        "Uzay teknolojilerini örneklendirir"
       ]
     },
-    "ozel_talimat": "Sorular eğlenceli ve günlük hayattan örneklerle olsun. Dil sade tutulsun."
+    "ozel_talimat": "Sorular eğlenceli, uzay temalı ve günlük hayatla bağlantılı olsun."
   }
   </script>
 
   <!--
     ============================================================
-    GÖMÜLÜ STATİK SORU BANKASI
-    Her istasyona dağıtılacak sorular. station_id ile eşleşir.
+    GÖMÜLÜ STATİK SORU BANKASI — akış sırasıyla gelir
     ============================================================
   -->
   <script id="question-bank" type="application/json">
   {
     "questions": [
       {
-        "station_id": "ist_1",
-        "ciktilar": "Hücre ve organellerini açıklar",
-        "soru": "Hücrenin enerji üretiminden sorumlu organel hangisidir?",
-        "secenekler": ["Ribozom", "Mitokondri", "Çekirdek", "Koful"],
-        "dogru": 1,
-        "odul": "guc"
+        "ciktilar": "Güneş sistemindeki gezegenleri tanır",
+        "soru": "Güneş sistemindeki en büyük gezegen hangisidir?",
+        "secenekler": ["Mars", "Jüpiter", "Dünya", "Venüs"],
+        "dogru": 1
       },
       {
-        "station_id": "ist_1",
-        "ciktilar": "Hücre ve organellerini açıklar",
-        "soru": "Bitki hücresini hayvan hücresinden ayıran yapı hangisidir?",
-        "secenekler": ["Hücre zarı", "Sitoplazma", "Hücre duvarı", "Ribozom"],
-        "dogru": 2,
-        "odul": "joker"
+        "ciktilar": "Güneş sistemindeki gezegenleri tanır",
+        "soru": "Güneş'e en yakın gezegen hangisidir?",
+        "secenekler": ["Merkür", "Venüs", "Mars", "Satürn"],
+        "dogru": 0
       },
       {
-        "station_id": "ist_2",
-        "ciktilar": "Mitoz ve mayoz bölünmeyi karşılaştırır",
-        "soru": "Üreme hücrelerinin oluşmasını sağlayan bölünme türü hangisidir?",
-        "secenekler": ["Mitoz", "Mayoz", "İkiye bölünme", "Tomurcuklanma"],
-        "dogru": 1,
-        "odul": "guc"
+        "ciktilar": "Güneş sistemindeki gezegenleri tanır",
+        "soru": "Halkalarıyla ünlü gezegen hangisidir?",
+        "secenekler": ["Neptün", "Uranüs", "Satürn", "Mars"],
+        "dogru": 2
       },
       {
-        "station_id": "ist_2",
-        "ciktilar": "Mitoz ve mayoz bölünmeyi karşılaştırır",
-        "soru": "Mitoz bölünme sonucu kaç hücre oluşur?",
-        "secenekler": ["2", "4", "1", "8"],
-        "dogru": 0,
-        "odul": "guc"
+        "ciktilar": "Ay'ın evrelerini açıklar",
+        "soru": "Ay'ın hiç görünmediği evreye ne ad verilir?",
+        "secenekler": ["Dolunay", "Yeni ay", "İlk dördün", "Son dördün"],
+        "dogru": 1
       },
       {
-        "station_id": "ist_3",
-        "ciktilar": "Kalıtımın temel kavramlarını tanır",
-        "soru": "Anne ve babadan yavruya geçen kalıtsal birime ne denir?",
-        "secenekler": ["Hücre", "Gen", "Doku", "Organ"],
-        "dogru": 1,
-        "odul": "joker"
+        "ciktilar": "Ay'ın evrelerini açıklar",
+        "soru": "Ay'ın tamamen aydınlık göründüğü evre hangisidir?",
+        "secenekler": ["Hilal", "Yeni ay", "Dolunay", "Şişkin ay"],
+        "dogru": 2
       },
       {
-        "station_id": "ist_3",
-        "ciktilar": "Kalıtımın temel kavramlarını tanır",
-        "soru": "Baskın (dominant) gen büyük harfle mi küçük harfle mi gösterilir?",
-        "secenekler": ["Küçük harf", "Büyük harf", "Rakam", "Sembol"],
-        "dogru": 1,
-        "odul": "guc"
+        "ciktilar": "Uzay teknolojilerini örneklendirir",
+        "soru": "Uzaya gönderilen, gezegenleri inceleyen araçlara ne denir?",
+        "secenekler": ["Uydu antifci", "Uzay sondası", "Pervane", "Teleskop kulesi"],
+        "dogru": 1
+      },
+      {
+        "ciktilar": "Uzay teknolojilerini örneklendirir",
+        "soru": "Dünya çevresinde dönerek haberleşme sağlayan araç hangisidir?",
+        "secenekler": ["Yapay uydu", "Roket", "Meteor", "Kuyruklu yıldız"],
+        "dogru": 0
       }
     ]
   }
@@ -146,36 +118,49 @@
   </script>
 </head>
 <body>
+  <!-- HUD -->
   <div id="hud">
-    <div class="hud-item">⚡ Güç: <span id="guc">0</span></div>
-    <div class="hud-item">🃏 Joker: <span id="joker">0</span></div>
-    <div class="hud-item">🏆 Puan: <span id="puan">0</span></div>
-    <div class="hud-item" id="hedef">İstasyon: 0/3</div>
+    <div class="hud-item">🏆 PUAN <span id="puan">0</span></div>
+    <div class="hud-item">⚡ GÜÇ <span id="guc">0</span></div>
+    <div class="hud-item">🃏 JOKER <span id="joker">0</span></div>
+    <div class="hud-item">🎯 SERİ <span id="seri">0</span></div>
+    <div class="hud-item" id="ilerleme">SORU 0/0</div>
   </div>
 
-  <div id="ipucu">WASD ile hareket et · İstasyona yaklaş ve <b>E</b> ile soruyu aç</div>
+  <!-- Soru bandı (ekranın üstünde) -->
+  <div id="soru-bandi" class="hidden">
+    <span id="soru-cikti"></span>
+    <h2 id="soru-metni"></h2>
+  </div>
 
-  <!-- Soru paneli (3D dışında, DOM overlay) -->
-  <div id="quiz-overlay" class="hidden">
-    <div id="quiz-box">
-      <p id="quiz-cikti" class="cikti"></p>
-      <h2 id="quiz-soru"></h2>
-      <div id="quiz-secenekler"></div>
-      <p id="quiz-sonuc"></p>
-      <button id="joker-btn">🃏 Joker kullan (0)</button>
+  <!-- Geçici bildirim (joker kazanma vb.) -->
+  <div id="bildirim" class="hidden"></div>
+
+  <!-- Başlangıç ekranı -->
+  <div id="baslangic">
+    <div class="panel">
+      <h1>ASTEROİD<br/>BİLGİ SAVAŞI</h1>
+      <p id="baslangic-aciklama">
+        Uzayın derinliklerindesin. Karşına gelen soruların cevapları asteroid
+        olarak üzerine akacak. Doğru cevabı taşıyan asteroide tıkla, lazerinle
+        patlat! Üst üste doğru cevaplarla <b>joker</b> kazan, yanlış atışta puan
+        kaybet. Hazır mısın komutan?
+      </p>
+      <button id="basla-btn">GÖREVE BAŞLA</button>
+      <p class="ipucu-kucuk">Fare ile asteroide tıkla · Doğru olanı vur</p>
     </div>
   </div>
 
-  <div id="kazandin" class="hidden">
-    <div class="kazandin-box">
-      <h1>🎉 Tebrikler!</h1>
-      <p>Tüm istasyonları tamamladın.</p>
-      <p id="final-skor"></p>
+  <!-- Bitiş ekranı -->
+  <div id="bitis" class="hidden">
+    <div class="panel">
+      <h1>GÖREV TAMAMLANDI</h1>
+      <p id="bitis-skor"></p>
       <div class="sifre-kutu">
-        <span class="sifre-etiket">🔑 Bitiş Şifren</span>
-        <span id="final-sifre"></span>
+        <span class="sifre-etiket">🔑 GÖREV ŞİFREN</span>
+        <span id="bitis-sifre"></span>
       </div>
-      <button onclick="location.reload()">Tekrar Oyna</button>
+      <button onclick="location.reload()">YENİDEN OYNA</button>
     </div>
   </div>
 

@@ -1,116 +1,101 @@
-// quiz.js — Soru paneli, 50:50 joker kullanımı, puan ve ödül yönetimi
+// quiz.js — Soru akışı, vuruş değerlendirme, puan/güç/joker, doğru seri ödülü
+import { sounds } from "./sound.js";
+
+const SERI_JOKER_ESIGI = 3;   // kaç doğru seride 1 joker
+const DOGRU_PUAN = 10;
+const YANLIS_CEZA = 5;
+const GUC_DOGRU = 1;
+
 export class Quiz {
-  constructor(questionBank, callbacks) {
-    this.bank = questionBank;
-    this.cb = callbacks; // { onUpdate, onStationDone }
+  constructor(questions, field, callbacks) {
+    this.questions = questions;
+    this.field = field;        // AsteroidField
+    this.cb = callbacks;       // { onUpdate, onQuestion, onBildirim, onFinish }
+    this.i = -1;
+    this.puan = 0;
     this.guc = 0;
     this.joker = 0;
-    this.puan = 0;
-    this.activeStation = null;
-    this.queue = [];
-    this.jokerKullanildi = false;
+    this.seri = 0;
 
-    this.overlay = document.getElementById("quiz-overlay");
-    this.elCikti = document.getElementById("quiz-cikti");
-    this.elSoru = document.getElementById("quiz-soru");
-    this.elSecenekler = document.getElementById("quiz-secenekler");
-    this.elSonuc = document.getElementById("quiz-sonuc");
-    this.elJokerBtn = document.getElementById("joker-btn");
-
-    this.elJokerBtn.onclick = () => this._jokerKullan();
+    // asteroid vuruşunu dinle
+    this.field.onHit = (index, grup) => this._vurus(index, grup);
   }
 
-  open(stationId) {
-    this.activeStation = stationId;
-    this.queue = this.bank.filter((q) => q.station_id === stationId);
-    this.overlay.classList.remove("hidden");
-    this._showNext();
+  basla() {
+    this._sonraki();
   }
 
-  _showNext() {
-    if (this.queue.length === 0) {
-      this.close();
-      this.cb.onStationDone(this.activeStation);
+  _sonraki() {
+    this.i++;
+    if (this.i >= this.questions.length) {
+      this.cb.onFinish(this._durum());
       return;
     }
-    const q = this.queue[0];
-    this.jokerKullanildi = false;
-    this.elCikti.textContent = "🎯 " + q.ciktilar;
-    this.elSoru.textContent = q.soru;
-    this.elSonuc.textContent = "";
-    this.elSecenekler.innerHTML = "";
-
-    q.secenekler.forEach((metin, i) => {
-      const btn = document.createElement("button");
-      btn.className = "secenek";
-      btn.dataset.index = i;
-      btn.textContent = metin;
-      btn.onclick = () => this._cevapla(q, i, btn);
-      this.elSecenekler.appendChild(btn);
-    });
-
-    this.elJokerBtn.disabled = this.joker <= 0;
-    this.elJokerBtn.textContent = `🃏 Joker kullan (${this.joker})`;
+    const q = this.questions[this.i];
+    this.cb.onQuestion(q, this.i + 1, this.questions.length);
+    this.field.spawn(q.secenekler);
   }
 
-  // 50:50 — yanlış şıklardan ikisini eler
-  _jokerKullan() {
-    if (this.joker <= 0 || this.jokerKullanildi) return;
-    const q = this.queue[0];
-    this.jokerKullanildi = true;
-    this.joker--;
+  _vurus(index, grup) {
+    const q = this.questions[this.i];
+    if (index === q.dogru) {
+      // DOĞRU — patlat, ödüllendir
+      this.field.patlat(grup);
+      this.puan += DOGRU_PUAN;
+      this.guc += GUC_DOGRU;
+      this.seri++;
 
-    const yanlislar = q.secenekler
-      .map((_, i) => i)
-      .filter((i) => i !== q.dogru);
-    yanlislar.sort(() => Math.random() - 0.5);
-    const elenecek = yanlislar.slice(0, 2);
-
-    this.elSecenekler.querySelectorAll(".secenek").forEach((btn) => {
-      if (elenecek.includes(Number(btn.dataset.index))) {
-        btn.classList.add("elendi");
-        btn.disabled = true;
-      }
-    });
-
-    this.elJokerBtn.disabled = true;
-    this.elJokerBtn.textContent = "🃏 Joker kullanıldı";
-    this.cb.onUpdate(this._durum());
-  }
-
-  _cevapla(q, secilen, btn) {
-    if (secilen === q.dogru) {
-      btn.classList.add("dogru");
-      const kazanilanPuan = this.jokerKullanildi ? 3 : 5;
-      this.puan += kazanilanPuan;
-
-      if (q.odul === "joker") {
+      let mesaj = `✅ Doğru! +${DOGRU_PUAN} puan`;
+      if (this.seri > 0 && this.seri % SERI_JOKER_ESIGI === 0) {
         this.joker++;
-        this.elSonuc.textContent = `✅ Doğru! 🃏 +1 Joker, +${kazanilanPuan} puan`;
-      } else {
-        this.guc++;
-        this.elSonuc.textContent = `✅ Doğru! ⚡ +1 Güç, +${kazanilanPuan} puan`;
+        mesaj = `🔥 ${this.seri}'li seri! 🃏 +1 JOKER kazandın!`;
       }
+      this.cb.onBildirim(mesaj, true);
       this.cb.onUpdate(this._durum());
-      this.queue.shift();
-      setTimeout(() => this._showNext(), 1000);
+      setTimeout(() => this._sonraki(), 1100);
     } else {
-      btn.classList.add("yanlis");
-      btn.disabled = true;
-      this.elSonuc.textContent = "❌ Yanlış! Diğer şıkları dene.";
+      // YANLIŞ — puan düşer, seri sıfırlanır
+      this.field.yanlisVurus(grup);
+      this.puan = Math.max(0, this.puan - YANLIS_CEZA);
+      this.seri = 0;
+      this.cb.onBildirim(`❌ Yanlış! -${YANLIS_CEZA} puan`, false);
+      this.cb.onUpdate(this._durum());
+    }
+  }
+
+  kullanJoker() {
+    if (this.i < 0 || this.i >= this.questions.length || this.field.kilit) return;
+
+    if (this.joker > 0) {
+      this.joker--;
+      sounds.playJoker();
+      this._jokerIleCoz("🃏 Joker kullanıldı!");
+    } else if (this.puan >= 30) {
+      this.puan -= 30;
+      sounds.playJoker();
+      this._jokerIleCoz("✨ 30 Puan karşılığı Joker kullanıldı!");
+    } else {
+      this.cb.onBildirim("❌ Yetersiz Joker veya Puan (En az 30 puan gerekir)!", false);
+    }
+  }
+
+  _jokerIleCoz(mesaj) {
+    const q = this.questions[this.i];
+    const grup = this.field.aktifler.find((g) => g.userData.index === q.dogru);
+    if (grup) {
+      this.field._lazerAt(grup.position);
+      this.field.patlat(grup);
+      this.puan += DOGRU_PUAN;
+      this.guc += GUC_DOGRU;
+      this.seri++;
+
+      this.cb.onBildirim(mesaj + ` +${DOGRU_PUAN} puan`, true);
+      this.cb.onUpdate(this._durum());
+      setTimeout(() => this._sonraki(), 1100);
     }
   }
 
   _durum() {
-    return { guc: this.guc, joker: this.joker, puan: this.puan };
-  }
-
-  close() {
-    this.overlay.classList.add("hidden");
-    this.activeStation = null;
-  }
-
-  get isOpen() {
-    return !this.overlay.classList.contains("hidden");
+    return { puan: this.puan, guc: this.guc, joker: this.joker, seri: this.seri };
   }
 }

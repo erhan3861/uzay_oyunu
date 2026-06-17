@@ -1,88 +1,141 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap');
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { overflow: hidden; font-family: system-ui, sans-serif; background: #0d1b2a; }
+body {
+  overflow: hidden;
+  font-family: 'Rajdhani', system-ui, sans-serif;
+  background: #05010f;
+  color: #e8f4ff;
+  cursor: crosshair;
+}
 canvas { display: block; }
-
-#hud {
-  position: fixed; top: 16px; left: 16px; z-index: 10;
-  display: flex; gap: 14px;
-}
-.hud-item {
-  background: rgba(13, 27, 42, 0.85); color: #e0fbfc;
-  padding: 10px 16px; border-radius: 12px; font-weight: 600;
-  border: 1px solid #415a77;
-}
-
-#ipucu {
-  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-  z-index: 10; color: #e0fbfc; background: rgba(13,27,42,.8);
-  padding: 10px 18px; border-radius: 20px; transition: opacity .3s;
-  border: 1px solid #415a77; font-size: 14px;
-}
-
 .hidden { display: none !important; }
 
-#quiz-overlay {
+/* ---------- HUD ---------- */
+#hud {
+  position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+  z-index: 10; display: flex; gap: 8px; flex-wrap: nowrap; justify-content: center;
+}
+.hud-item {
+  font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 13px;
+  letter-spacing: 0.5px; color: #9fe3ff;
+  background: rgba(10, 18, 40, 0.7); border: 1px solid rgba(63, 216, 255, 0.35);
+  padding: 6px 12px; border-radius: 8px; backdrop-filter: blur(6px);
+  transition: border-color 0.25s, background-color 0.25s, transform 0.2s;
+  white-space: nowrap;
+}
+.hud-item span { color: #fff; margin-left: 4px; }
+
+#joker-hud {
+  cursor: pointer;
+  user-select: none;
+}
+#joker-hud:hover {
+  background: rgba(10, 24, 55, 0.85);
+  transform: scale(1.05);
+}
+#joker-hud:active {
+  transform: scale(0.95);
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); filter: brightness(1.3); }
+  100% { transform: scale(1); }
+}
+.pulse {
+  animation: pulse 0.3s ease-in-out;
+}
+
+/* ---------- Soru bandı ---------- */
+#soru-bandi {
+  position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+  z-index: 10; width: min(720px, 92vw); text-align: center;
+  background: rgba(10, 18, 40, 0.78); border: 1px solid rgba(63, 216, 255, 0.4);
+  border-radius: 14px; padding: 14px 22px; backdrop-filter: blur(8px);
+  box-shadow: 0 8px 40px rgba(63, 216, 255, 0.15);
+}
+#soru-cikti { font-size: 13px; color: #6fb8ff; letter-spacing: 1px; }
+#soru-metni { font-size: 22px; font-weight: 600; margin-top: 6px; line-height: 1.3; }
+
+/* ---------- Bildirim ---------- */
+#bildirim {
+  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+  z-index: 12; font-family: 'Orbitron', sans-serif; font-weight: 700;
+  font-size: 20px; padding: 12px 28px; border-radius: 12px;
+  animation: pop .25s ease;
+}
+#bildirim.basarili { background: rgba(12, 60, 40, 0.92); color: #4fffa8; border: 1px solid #4fffa8; }
+#bildirim.hata { background: rgba(70, 12, 20, 0.92); color: #ff7a8a; border: 1px solid #ff7a8a; }
+@keyframes pop { from { transform: translateX(-50%) scale(0.8); opacity: 0; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
+
+/* ---------- Paneller (başlangıç / bitiş) ---------- */
+#baslangic, #bitis {
   position: fixed; inset: 0; z-index: 20;
-  background: rgba(5, 12, 22, 0.75); backdrop-filter: blur(4px);
   display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 50% 40%, rgba(40, 20, 80, 0.6), rgba(5, 1, 15, 0.95));
 }
-#quiz-box {
-  background: #1b263b; color: #e0fbfc; width: min(520px, 92vw);
-  padding: 28px; border-radius: 18px; border: 1px solid #415a77;
-  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+.panel {
+  width: min(540px, 92vw); text-align: center;
+  background: rgba(10, 16, 36, 0.85); border: 1px solid rgba(63, 216, 255, 0.4);
+  border-radius: 20px; padding: 40px 36px; backdrop-filter: blur(10px);
+  box-shadow: 0 20px 80px rgba(63, 216, 255, 0.2);
 }
-.cikti { color: #90e0ef; font-size: 13px; margin-bottom: 8px; }
-#quiz-box h2 { font-size: 20px; margin-bottom: 20px; line-height: 1.4; }
-#quiz-secenekler { display: grid; gap: 10px; }
-.secenek {
-  background: #2a3a52; color: #e0fbfc; border: 1px solid #415a77;
-  padding: 14px; border-radius: 12px; font-size: 15px; cursor: pointer;
-  text-align: left; transition: all .15s;
+.panel h1 {
+  font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 38px;
+  line-height: 1.05; letter-spacing: 2px;
+  background: linear-gradient(120deg, #3fd8ff, #b07bff);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 18px;
 }
-.secenek:hover { background: #34465f; transform: translateX(4px); }
-.secenek.dogru { background: #06d6a0; color: #04231b; border-color: #06d6a0; }
-.secenek.yanlis { background: #ef476f; border-color: #ef476f; }
-#quiz-sonuc { margin-top: 16px; font-weight: 600; min-height: 22px; text-align: center; }
+.panel p { font-size: 17px; line-height: 1.5; color: #c5d8ee; margin-bottom: 24px; }
+.panel button {
+  font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 16px;
+  letter-spacing: 1px; cursor: pointer;
+  background: linear-gradient(120deg, #3fd8ff, #6f8bff); color: #04121f;
+  border: none; padding: 14px 36px; border-radius: 12px;
+  transition: transform .15s, box-shadow .15s;
+}
+.panel button:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(63, 216, 255, 0.5); }
+.ipucu-kucuk { font-size: 14px; color: #6c84a8; margin-top: 16px; margin-bottom: 0; }
 
-#kazandin {
-  position: fixed; inset: 0; z-index: 30;
-  background: rgba(5,12,22,.9); display: flex;
-  align-items: center; justify-content: center;
-}
-.kazandin-box {
-  background: #1b263b; color: #e0fbfc; text-align: center;
-  padding: 40px; border-radius: 20px; border: 1px solid #415a77;
-}
-.kazandin-box h1 { font-size: 32px; margin-bottom: 12px; }
-.kazandin-box p { margin: 8px 0; }
-.kazandin-box button {
-  margin-top: 18px; background: #4cc9f0; color: #04231b; border: none;
-  padding: 12px 28px; border-radius: 12px; font-weight: 700; cursor: pointer;
-}
-
-/* Joker butonu */
-#joker-btn {
-  margin-top: 16px; width: 100%;
-  background: #7209b7; color: #fff; border: none;
-  padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer;
-  transition: opacity .2s;
-}
-#joker-btn:disabled { opacity: .4; cursor: not-allowed; }
-#joker-btn:not(:disabled):hover { background: #8a1ed0; }
-
-/* Joker ile elenen şık */
-.secenek.elendi {
-  opacity: .25; text-decoration: line-through; pointer-events: none;
-}
-
-/* Bitiş şifre kutusu */
+/* ---------- Görev şifresi ---------- */
 .sifre-kutu {
   margin: 18px 0; padding: 16px; border-radius: 14px;
-  background: #0d1b2a; border: 2px dashed #4cc9f0;
+  background: rgba(5, 10, 25, 0.7); border: 2px dashed #3fd8ff;
   display: flex; flex-direction: column; gap: 6px;
 }
-.sifre-etiket { font-size: 13px; color: #90e0ef; }
-#final-sifre {
-  font-size: 24px; font-weight: 800; letter-spacing: 2px; color: #ffd60a;
-  font-family: monospace;
+.sifre-etiket { font-size: 13px; color: #6fb8ff; letter-spacing: 1px; }
+#bitis-sifre {
+  font-family: 'Orbitron', monospace; font-size: 26px; font-weight: 900;
+  letter-spacing: 3px; color: #ffd27a;
+}
+
+/* ---------- Mobil ---------- */
+@media (max-width: 600px) {
+  .panel h1 { font-size: 28px; }
+  #soru-metni { font-size: 18px; }
+  .hud-item { font-size: 12px; padding: 6px 10px; }
+}
+
+/* ---------- Ses Kontrol Butonu ---------- */
+#ses-kontrol {
+  position: fixed; top: 16px; right: 16px;
+  cursor: pointer; z-index: 100;
+  font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 14px;
+  letter-spacing: 1px; color: #ff7a8a;
+  background: rgba(40, 10, 18, 0.7); border: 1px solid rgba(255, 122, 138, 0.35);
+  padding: 8px 14px; border-radius: 8px; backdrop-filter: blur(6px);
+  transition: all 0.25s;
+  user-select: none;
+}
+#ses-kontrol.aktif {
+  color: #4fffa8;
+  background: rgba(10, 40, 24, 0.7); border: 1px solid rgba(79, 255, 168, 0.35);
+}
+#ses-kontrol:hover {
+  transform: scale(1.05);
+}
+#ses-kontrol:active {
+  transform: scale(0.95);
 }
